@@ -1,0 +1,83 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <!-- Create User table -->
+    <changeSet id="create-user-table" author="aaandreev">
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar"/>
+            <column name="surname" type="varchar"/>
+            <column name="email" type="varchar"/>
+            <column name="password" type="varchar"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Create Project table -->
+    <changeSet id="create-project-table" author="aaandreev">
+        <createTable tableName="project">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Create Model table -->
+    <changeSet id="create-model-table" author="aaandreev">
+        <createTable tableName="model">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="labels" type="jsonb"/>
+            <column name="is_learnt" type="boolean"/>
+            <column name="is_valid" type="boolean"/>
+            <column name="type" type="varchar"/>
+            <column name="id_project" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_model_to_project" references="project(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create Role table -->
+    <changeSet id="create-role-table" author="aaandreev">
+        <createTable tableName="role">
+            <column name="id" type="serial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Create UserToProjectAgent table -->
+    <changeSet id="create-user-project-agent-table" author="aaandreev">
+        <createTable tableName="user_project_agent">
+            <column name="id_user" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_project_agent_user" references="users(id)"/>
+            </column>
+            <column name="id_role" type="integer">
+                <constraints nullable="false" foreignKeyName="fk_user_project_agent_role" references="role(id)"/>
+            </column>
+            <column name="id_project" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_project_agent_project" references="project(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create ProjectModelAgent table -->
+    <changeSet id="create-user-model-agent-table" author="aaandreev">
+        <createTable tableName="user_model_agent">
+            <column name="id_user" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_model_agent_user" references="users(id)"/>
+            </column>
+            <column name="id_model" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_model_agent_model" references="model(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

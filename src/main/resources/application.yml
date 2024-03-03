@@ -1,0 +1,22 @@
+server:
+  forward-headers-strategy: framework
+  shutdown: graceful
+  port: 8080
+
+spring:
+  jpa:
+    show-sql: false
+  liquibase:
+    change-log: classpath:db/changelog/liquibase-changelog.xml
+    enabled: true
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/ocrdatabase?ApplicationName=ocr_backend"
+    username: pguser
+    password: secret
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
