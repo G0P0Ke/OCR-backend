@@ -13,6 +13,12 @@ spring:
     url: "jdbc:postgresql://localhost:5432/ocrdatabase?ApplicationName=ocr_backend"
     username: pguser
     password: secret
+    hikari:
+      leak-detection-threshold: 10000
+      maximum-pool-size: 10
+      maxLifetime: 1800000 # 30min
+      connectionTimeout: 30000 # 30sec
+      idleTimeout: 600000 # 10min
 
 management:
   endpoints:
@@ -20,3 +26,15 @@ management:
       exposure:
         include: "*"
 
+
+logging:
+  level:
+    ROOT: INFO
+    org.zalando.logbook.Logbook: TRACE
+    org.hibernate.SQL: ERROR  # DEBUG for sql logging
+    org.hibernate.type: ERROR # TRACE for sql logging
+    org.hibernate.stat: ERROR # DEBUG for statistics logging
+    org.springframework.orm.jpa: ERROR # TRACE for transactions logging
+    org.springframework.transaction.interceptor: ERROR # TRACE for transactions logging
+  pattern:
+    console: "${spring.application.name} %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %X{traceId} - %msg%n"
