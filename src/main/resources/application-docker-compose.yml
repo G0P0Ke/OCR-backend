@@ -1,0 +1,6 @@
+spring:
+  liquibase:
+    change-log: classpath:db/changelog/liquibase-changelog.xml
+    enabled: true
+  datasource:
+    url: "jdbc:postgresql://db/ocrdatabase?ApplicationName=ocr_backend"
