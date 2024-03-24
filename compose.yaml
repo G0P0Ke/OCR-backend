@@ -16,14 +16,15 @@ services:
       retries: 5
 
   app:
-    image: docker.io/gopoke/ocr-backend:0.0.1-SNAPSHOT
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     environment:
+      SPRING_PROFILES_ACTIVE: docker-compose
       DB_URL: db
       DB_USER: pguser
       DB_PASS: secret
       DB_NAME: ocrdatabase
-      SERVER_PORT: 8080
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db/ocrdatabase?ApplicationName=ocr_backend
     ports:
       - "8080:8080"
     depends_on:
