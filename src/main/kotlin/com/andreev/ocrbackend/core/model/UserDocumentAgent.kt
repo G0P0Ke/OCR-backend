@@ -12,10 +12,10 @@ import javax.persistence.MapsId
 import javax.persistence.Table
 
 @Entity
-@Table(name = "user_model_agent")
-data class UserModelAgent(
+@Table(name = "user_document_agent")
+data class UserDocumentAgent(
     @EmbeddedId
-    val id: UserModelAgentId,
+    val id: UserDocumentAgentId,
 
     @ManyToOne
     @MapsId("idUser")
@@ -23,15 +23,15 @@ data class UserModelAgent(
     val user: User,
 
     @ManyToOne
-    @MapsId("idModel")
-    @JoinColumn(name = "id_model", insertable = false, updatable = false)
-    val model: Model
+    @MapsId("idDocument")
+    @JoinColumn(name = "id_document", insertable = false, updatable = false)
+    val document: Document
 )
 
 @Embeddable
-data class UserModelAgentId(
+data class UserDocumentAgentId(
     @Column(name = "id_user")
     val idUser: UUID,
-    @Column(name = "id_model")
-    val idModel: UUID
+    @Column(name = "id_document")
+    val idDocument: UUID
 ) : Serializable

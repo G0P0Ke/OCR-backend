@@ -1,0 +1,27 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <!-- Create Model table -->
+    <changeSet id="create-model-table" author="aaandreev">
+        <createTable tableName="model">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="status" type="varchar">
+                <constraints nullable="true"/>
+            </column>
+            <column name="type" type="varchar">
+                <constraints nullable="true"/>
+            </column>
+            <column name="id_project" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_model_to_project" references="project(id)"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

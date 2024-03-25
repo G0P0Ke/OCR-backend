@@ -39,7 +39,7 @@ data class UserProjectAgentId(
     @Column(name = "id_user")
     val idUser: UUID,
     @Column(name = "id_role")
-    val idRole: Int,
+    val idRole: Long,
     @Column(name = "id_project")
     val idProject: UUID
 ) : Serializable

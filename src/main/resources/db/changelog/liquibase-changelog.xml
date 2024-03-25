@@ -5,4 +5,7 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
     <include file="2023-02-07-init.xml" relativeToChangelogFile="true"/>
+    <include file="2024-03-25-add-date-column.xml" relativeToChangelogFile="true"/>
+    <include file="2024-03-25-add-url-path-column.xml" relativeToChangelogFile="true"/>
+    <include file="2024-03-25-create-model-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -4,6 +4,11 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: @project.name@
+  web:
+    locale: en_GB
+    locale-resolver: fixed
   jpa:
     show-sql: false
   liquibase:

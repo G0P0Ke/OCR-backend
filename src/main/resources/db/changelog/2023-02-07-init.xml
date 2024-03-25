@@ -27,9 +27,9 @@
         </createTable>
     </changeSet>
 
-    <!-- Create Model table -->
-    <changeSet id="create-model-table" author="aaandreev">
-        <createTable tableName="model">
+    <!-- Create document table -->
+    <changeSet id="create-document-table" author="aaandreev">
+        <createTable tableName="document">
             <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -38,7 +38,7 @@
             <column name="is_valid" type="boolean"/>
             <column name="type" type="varchar"/>
             <column name="id_project" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_model_to_project" references="project(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_document_to_project" references="project(id)"/>
             </column>
         </createTable>
     </changeSet>
@@ -51,6 +51,25 @@
             </column>
             <column name="name" type="varchar"/>
         </createTable>
+    </changeSet>
+
+    <!-- Populate Role table with role names -->
+    <changeSet id="populate-role-table" author="aaandreev">
+        <insert tableName="role">
+            <column name="name" value="ROLE_ADMIN"/>
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="ROLE_MODERATOR"/>
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="ROLE_MANAGER"/>
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="ROLE_ASSESSOR"/>
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="ROLE_USER"/>
+        </insert>
     </changeSet>
 
     <!-- Create UserToProjectAgent table -->
@@ -68,14 +87,15 @@
         </createTable>
     </changeSet>
 
-    <!-- Create ProjectModelAgent table -->
-    <changeSet id="create-user-model-agent-table" author="aaandreev">
-        <createTable tableName="user_model_agent">
+    <!-- Create ProjectDocumentAgent table -->
+    <changeSet id="create-user-document-agent-table" author="aaandreev">
+        <createTable tableName="user_document_agent">
             <column name="id_user" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_user_model_agent_user" references="users(id)"/>
+                <constraints nullable="false" foreignKeyName="fk_user_document_agent_user" references="users(id)"/>
             </column>
-            <column name="id_model" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_user_model_agent_model" references="model(id)"/>
+            <column name="id_document" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_document_agent_document"
+                             references="document(id)"/>
             </column>
         </createTable>
     </changeSet>
