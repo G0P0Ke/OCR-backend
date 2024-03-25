@@ -4,3 +4,8 @@ spring:
     enabled: true
   datasource:
     url: "jdbc:postgresql://localhost:5432/ocrdatabase?ApplicationName=ocr_backend"
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest

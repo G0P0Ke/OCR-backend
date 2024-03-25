@@ -55,6 +55,9 @@ data class Model(
     }
 
     enum class Status {
-        NEW, IN_PROGRESS, FAILED, TAUGHT
+        NEW, // Модель только создана (в момент создания проекта)
+        IN_PROGRESS, // Отправлена команда на обучение модели
+        FAILED, // Обучение модели провалено
+        TAUGHT // Модель обучена
     }
 }
