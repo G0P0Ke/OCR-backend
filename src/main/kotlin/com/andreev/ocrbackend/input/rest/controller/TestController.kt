@@ -1,4 +1,4 @@
-package com.andreev.ocrbackend.input.rest
+package com.andreev.ocrbackend.input.rest.controller
 
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "labels": {
+      "type": "array",
+      "minItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "required": [
+            "labelName",
+            "x",
+            "y",
+            "width",
+            "height",
+            "rotate"
+          ],
+          "properties": {
+            "labelName": {
+              "type": "string"
+            },
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            },
+            "width": {
+              "type": "number"
+            },
+            "height": {
+              "type": "number"
+            },
+            "rotate": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "isLabeled": {
+      "type": "boolean"
+    },
+    "assessor": {
+      "type": "string"
+    }
+  }
+}

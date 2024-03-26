@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.input.rest.advice
 
+import com.andreev.ocrbackend.DocumentNotFoundException
 import com.andreev.ocrbackend.ModelNotFoundException
 import com.andreev.ocrbackend.ProjectNotFoundException
 import com.andreev.ocrbackend.UserAlreadyExistsException
@@ -83,6 +84,13 @@ class RestErrorHandler(val exceptionMessageSource: MessageSource) : ResponseEnti
     @ExceptionHandler(value = [ProjectNotFoundException::class])
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     fun handle(e: ProjectNotFoundException): ErrorResponse {
+        log.info(e) { e.message }
+        return ErrorResponse(listOf(ErrorDescription(e.message)))
+    }
+
+    @ExceptionHandler(value = [DocumentNotFoundException::class])
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    fun handle(e: DocumentNotFoundException): ErrorResponse {
         log.info(e) { e.message }
         return ErrorResponse(listOf(ErrorDescription(e.message)))
     }

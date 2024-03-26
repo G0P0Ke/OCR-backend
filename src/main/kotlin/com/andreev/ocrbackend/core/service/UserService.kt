@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.core.service
 
+import com.andreev.ocrbackend.UserNotFoundException
 import com.andreev.ocrbackend.core.model.User
 import com.andreev.ocrbackend.core.repository.UserRepository
 import com.andreev.ocrbackend.core.service.domain.security.JwtResponse
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 class UserService(
@@ -26,6 +28,15 @@ class UserService(
     }
 
     fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
+
+    fun findById(id: UUID) : User {
+        val user = userRepository.findById(id)
+        if (user.isEmpty) {
+            logger.error { "User with id: $id not found" }
+            throw UserNotFoundException(id)
+        }
+        return user.get()
+    }
 
     @Transactional
     fun register(email: String, password: String): User {

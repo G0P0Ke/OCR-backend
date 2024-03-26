@@ -24,7 +24,7 @@ data class Project(
     val id: UUID = UUID.randomUUID(),
 
     @Column(name = "name")
-    val name: String,
+    var name: String,
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

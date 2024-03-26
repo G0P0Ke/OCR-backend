@@ -2,6 +2,7 @@ package com.andreev.ocrbackend.core.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.UUID
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -22,14 +23,14 @@ data class User(
     @Column(name = "surname")
     var surname: String? = null,
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     var email: String,
 
     @Column(name = "password")
     @JsonIgnore
     var password: String,
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)])
     @JsonIgnore
     val projects: MutableSet<UserProjectAgent> = mutableSetOf(),
 ) {

@@ -5,13 +5,25 @@ import com.andreev.ocrbackend.dto.ProjectResponse
 import org.springframework.stereotype.Component
 
 @Component
-class ProjectConverter {
+class ProjectConverter(
+    private val documentConverter: DocumentConverter,
+    private val userConverter: UserConverter,
+) {
 
-    fun projectToResponse(project: Project) = with(project) {
+    fun toResponse(project: Project) = with(project) {
         ProjectResponse(
             id = id,
             name = name,
-            createdAt = createdAt
+            createdAt = createdAt,
+            document = documents?.map { document ->
+                documentConverter.toResponse(document)
+            } ?: emptyList(),
+            participants = project.participants?.map { userProjectAgent ->
+                userConverter.toResponseWithRole(
+                    user = userProjectAgent.user,
+                    role = userProjectAgent.role
+                )
+            } ?: emptyList()
         )
     }
 }

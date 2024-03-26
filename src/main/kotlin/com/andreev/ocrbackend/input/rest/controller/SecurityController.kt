@@ -1,4 +1,4 @@
-package com.andreev.ocrbackend.input.rest
+package com.andreev.ocrbackend.input.rest.controller
 
 import com.andreev.ocrbackend.core.service.UserService
 import com.andreev.ocrbackend.core.service.domain.security.JwtResponse
