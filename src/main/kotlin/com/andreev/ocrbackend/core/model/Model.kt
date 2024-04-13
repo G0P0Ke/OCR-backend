@@ -29,7 +29,7 @@ data class Model(
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    val status: Status = Status.NEW,
+    var status: Status = Status.NEW,
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

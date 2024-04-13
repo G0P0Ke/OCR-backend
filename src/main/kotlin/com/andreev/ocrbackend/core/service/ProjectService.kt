@@ -1,12 +1,17 @@
 package com.andreev.ocrbackend.core.service
 
 import com.andreev.ocrbackend.ProjectNotFoundException
+import com.andreev.ocrbackend.Rabbit
+import com.andreev.ocrbackend.core.enums.Command
+import com.andreev.ocrbackend.core.model.Model
 import com.andreev.ocrbackend.core.model.Project
 import com.andreev.ocrbackend.core.model.security.RoleName
 import com.andreev.ocrbackend.core.repository.ProjectRepository
 import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import com.andreev.ocrbackend.dto.CreateProjectRequest
+import com.andreev.ocrbackend.dto.ModelMessage
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
+import com.andreev.ocrbackend.output.rabbit.RabbitSender
 import mu.KLogging
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
@@ -21,6 +26,7 @@ class ProjectService(
     private val roleService: RoleService,
     private val modelService: ModelService,
     private val documentService: DocumentService,
+    private val rabbitSender: RabbitSender
 ) {
 
     companion object : KLogging()
@@ -83,4 +89,19 @@ class ProjectService(
         logger.info { "Successfully updated $savedProject" }
         return savedProject
     }
+
+    @Transactional
+    fun executeProject(id: UUID) {
+        val project = findById(id)
+        val model = modelService.getModelByProjectId(project)
+        val message = ModelMessage(modelId = model.id.toString(), command = Command.EXECUTE)
+        modelService.updateStatusModel(status = Model.Status.IN_PROGRESS, model = model)
+
+        rabbitSender.send(
+            exchange = Rabbit.Exchange.OCRBACKEND_TX_X_HSE_LEARNING_COMMANDS_V1,
+            message = message,
+            routingKey = Rabbit.RoutingKey.OCRBACKEND_COMMAND_EXECUTE_MODEL
+        )
+    }
+
 }

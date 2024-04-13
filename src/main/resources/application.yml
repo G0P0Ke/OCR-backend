@@ -6,6 +6,13 @@ server:
 spring:
   application:
     name: @project.name@
+  rabbitmq:
+    publisher-returns: true
+    cache:
+      channel:
+        size: 25
+      connection:
+        mode: CONNECTION
   web:
     locale: en_GB
     locale-resolver: fixed
@@ -24,6 +31,7 @@ spring:
       maxLifetime: 1800000 # 30min
       connectionTimeout: 30000 # 30sec
       idleTimeout: 600000 # 10min
+
 
 management:
   endpoints:

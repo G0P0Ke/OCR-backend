@@ -46,8 +46,16 @@ class ProjectController(
     @GetMapping("/project/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getProject(
         @PathVariable id: UUID
-    ) : ResponseEntity<ProjectResponse> {
+    ): ResponseEntity<ProjectResponse> {
         val result = projectService.findById(id)
         return ResponseEntity.ok(projectConverter.toResponse(result))
+    }
+
+    @PostMapping("/project/{id}:execute", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun executeProject(
+        @PathVariable id: UUID
+    ): ResponseEntity<String> {
+        projectService.executeProject(id)
+        return ResponseEntity.ok("Success. Project with id: $id was sent to execute")
     }
 }

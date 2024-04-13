@@ -20,4 +20,12 @@ class ModelService(
         val savedModel = modelRepository.save(newModel)
         logger.info { "Successfully created Model: $savedModel for Project: ${project.id}" }
     }
+
+    fun getModelByProjectId(project: Project): Model = modelRepository.findModelByProject(project)
+
+    @Transactional
+    fun updateStatusModel(status: Model.Status, model: Model) {
+        model.status = status
+        modelRepository.save(model)
+    }
 }
