@@ -26,6 +26,9 @@ data class User(
     @Column(name = "email", unique = true)
     var email: String,
 
+    @Column(name = "company")
+    var company: String? = null,
+
     @Column(name = "password")
     @JsonIgnore
     var password: String,

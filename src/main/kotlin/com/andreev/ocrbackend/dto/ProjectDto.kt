@@ -8,7 +8,10 @@ import javax.validation.constraints.Size
 
 data class CreateProjectRequest(
     @field:[NotNull Size(min = 1, max = 255)]
-    val name: String
+    val name: String,
+    @field:[NotNull Size(min = 1, max = 255)]
+    val description: String,
+    val participants: Set<ParticipantAdd>?
 )
 
 data class UpdateProjectRequest(
@@ -16,15 +19,17 @@ data class UpdateProjectRequest(
     val name: String?,
     val participants: Set<ParticipantAdd>?,
     val documents: Set<DocumentCreateRequest>?
+)
+
+data class ParticipantAdd(
+    val userId: UUID,
+    @field:EnumValue(ProjectRole::class)
+    val role: String,
 ) {
-    data class ParticipantAdd(
-        val userId: UUID,
-        @field:EnumValue(ProjectRole::class)
-        val role: String,
-    ) {
-        enum class ProjectRole {
-            ROLE_MODERATOR, ROLE_MANAGER, ROLE_ASSESSOR
-        }
+    enum class ProjectRole {
+        ROLE_MODERATOR,
+        ROLE_MANAGER, // users with this role can add assessors
+        ROLE_ASSESSOR // users with this role can start labeling
     }
 }
 

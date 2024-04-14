@@ -26,6 +26,9 @@ data class Project(
     @Column(name = "name")
     var name: String,
 
+    @Column(name = "description")
+    var description: String,
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

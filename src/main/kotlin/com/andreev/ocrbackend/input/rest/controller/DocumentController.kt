@@ -23,7 +23,7 @@ import java.util.UUID
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/document")
 class DocumentController(
     private val documentService: DocumentService,
     private val jsonValidationService: JsonValidationService,
@@ -35,7 +35,7 @@ class DocumentController(
         private val objectMapper: ObjectMapper = jacksonObjectMapper()
     }
 
-    @GetMapping("/document/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Получение документа по id"
     )
@@ -46,7 +46,7 @@ class DocumentController(
         return ResponseEntity.ok(documentConverter.toResponse(document = result))
     }
 
-    @PatchMapping("/document/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PatchMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateDocument(
         @PathVariable id: UUID,
         @RequestBody @Valid request: JsonNode
@@ -57,7 +57,7 @@ class DocumentController(
         return ResponseEntity.ok(documentConverter.toResponse(document = result))
     }
 
-    @DeleteMapping("/document/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @DeleteMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun deleteDocument(
         @PathVariable id: UUID
     ) : ResponseEntity<String> {

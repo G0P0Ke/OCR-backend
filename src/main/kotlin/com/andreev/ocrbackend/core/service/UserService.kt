@@ -27,6 +27,8 @@ class UserService(
         private var passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
     }
 
+    fun findUsersByCompany(company: String): Collection<User> = userRepository.findUsersByCompany(company)
+
     fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
 
     fun findById(id: UUID) : User {
@@ -39,9 +41,13 @@ class UserService(
     }
 
     @Transactional
-    fun register(email: String, password: String): User {
-        logger.info { "Saving user with email: $email" }
-        val user = User(email = email, password = passwordEncoder.encode(password))
+    fun register(entryDto: EntryDto): User {
+        logger.info { "Saving user with email: ${entryDto.email}" }
+        val user = User(
+            email = entryDto.email,
+            password = passwordEncoder.encode(entryDto.password),
+            company = entryDto.company
+        )
         val result = userRepository.save(user)
         logger.info { "Saved user $result" }
         return result

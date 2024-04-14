@@ -13,6 +13,7 @@ class UserConverter {
         email = user.email,
         name = user.name,
         surname = user.surname,
+        company = user.company
     )
 
     fun toResponseWithRole(user: User, role: Role) = UserResponse(
@@ -22,4 +23,7 @@ class UserConverter {
         surname = user.surname,
         role = role.name.name
     )
+
+    fun collectionToResponse(collection: Collection<User>) = collection.map { user -> toResponse(user) }
+
 }

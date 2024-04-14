@@ -8,4 +8,5 @@
     <include file="2024-03-25-add-date-column.xml" relativeToChangelogFile="true"/>
     <include file="2024-03-25-add-url-path-column.xml" relativeToChangelogFile="true"/>
     <include file="2024-03-25-create-model-table.xml" relativeToChangelogFile="true"/>
+    <include file="2024-04-13-update-project-and-users-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

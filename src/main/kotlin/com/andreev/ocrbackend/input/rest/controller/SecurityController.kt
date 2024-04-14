@@ -23,8 +23,8 @@ class SecurityController(
 
     @PostMapping(value = ["/register"], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(summary = "Регистрация пользователей")
-    fun register(@Valid @RequestBody entryDto: EntryDto): ResponseEntity<UserResponse> {
-        val user = userService.register(email = entryDto.email, password = entryDto.password)
+    fun register(@Valid @RequestBody request: EntryDto): ResponseEntity<UserResponse> {
+        val user = userService.register(entryDto = request)
         return ResponseEntity.ok(userConverter.toResponse(user))
     }
 

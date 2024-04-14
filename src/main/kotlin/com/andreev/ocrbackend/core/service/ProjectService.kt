@@ -46,7 +46,7 @@ class ProjectService(
         val creator = authentication.principal as UserPrinciple
         val user = userService.getUserByEmail(creator.username)
 
-        val project = Project(name = request.name)
+        val project = Project(name = request.name, description = request.description)
         val savedProject = projectRepository.save(project)
         modelService.createModel(savedProject)
 
@@ -57,6 +57,16 @@ class ProjectService(
             project = project,
             role = role
         )
+
+        request.participants?.map { userAdd ->
+            val userToProject = userService.findById(userAdd.userId)
+            val roleOfNewParticipants = roleService.findRoleByName(RoleName.valueOf(userAdd.role))
+            userProjectAgentService.createUserProjectAgent(
+                user = userToProject,
+                project = project,
+                role = roleOfNewParticipants
+            )
+        }
 
         logger.info { "Successfully created $savedProject" }
 

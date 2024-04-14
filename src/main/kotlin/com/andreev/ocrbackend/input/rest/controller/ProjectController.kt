@@ -19,13 +19,13 @@ import java.util.UUID
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v1/project")
 class ProjectController(
     private val projectService: ProjectService,
     private val projectConverter: ProjectConverter
 ) {
 
-    @PostMapping("/project", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun createProject(
         authentication: Authentication,
         @RequestBody @Valid request: CreateProjectRequest,
@@ -34,7 +34,7 @@ class ProjectController(
         return ResponseEntity.ok(projectConverter.toResponse(result))
     }
 
-    @PatchMapping("/project/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PatchMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateProject(
         @PathVariable id: UUID,
         @RequestBody @Valid request: UpdateProjectRequest,
@@ -43,7 +43,7 @@ class ProjectController(
         return ResponseEntity.ok(projectConverter.toResponse(result))
     }
 
-    @GetMapping("/project/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getProject(
         @PathVariable id: UUID
     ): ResponseEntity<ProjectResponse> {
@@ -51,7 +51,7 @@ class ProjectController(
         return ResponseEntity.ok(projectConverter.toResponse(result))
     }
 
-    @PostMapping("/project/{id}:execute", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping("/{id}:execute", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun executeProject(
         @PathVariable id: UUID
     ): ResponseEntity<String> {
