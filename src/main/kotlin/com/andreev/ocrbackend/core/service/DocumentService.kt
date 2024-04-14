@@ -33,7 +33,6 @@ class DocumentService(
     fun createDocument(project: Project, request: DocumentCreateRequest): Document {
         val document = Document(
             urlPath = request.urlPath,
-            type = request.type,
             project = project
         )
         val savedDocument = documentRepository.save(document)

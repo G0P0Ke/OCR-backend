@@ -47,6 +47,10 @@ class DocumentController(
     }
 
     @PatchMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+        summary = "Обновление документа по id",
+        description = "Отправка разметки по документу и информации о assessor'e"
+    )
     fun updateDocument(
         @PathVariable id: UUID,
         @RequestBody @Valid request: JsonNode
@@ -58,9 +62,12 @@ class DocumentController(
     }
 
     @DeleteMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+        summary = "Удаление документа по id",
+    )
     fun deleteDocument(
         @PathVariable id: UUID
-    ) : ResponseEntity<String> {
+    ): ResponseEntity<String> {
         documentService.deleteDocument(id)
         return ResponseEntity.ok("Successfully deleted document with id: $id")
     }

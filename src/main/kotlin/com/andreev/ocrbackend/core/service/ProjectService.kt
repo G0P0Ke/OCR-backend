@@ -9,14 +9,17 @@ import com.andreev.ocrbackend.core.model.security.RoleName
 import com.andreev.ocrbackend.core.repository.ProjectRepository
 import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import com.andreev.ocrbackend.dto.CreateProjectRequest
+import com.andreev.ocrbackend.dto.DocumentCreateRequest
 import com.andreev.ocrbackend.dto.ModelMessage
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
 import com.andreev.ocrbackend.output.rabbit.RabbitSender
 import mu.KLogging
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 import javax.transaction.Transactional
+
 
 @Service
 class ProjectService(
@@ -26,6 +29,7 @@ class ProjectService(
     private val roleService: RoleService,
     private val modelService: ModelService,
     private val documentService: DocumentService,
+    private val s3StorageService: YandexStorageService,
     private val rabbitSender: RabbitSender
 ) {
 
@@ -112,6 +116,19 @@ class ProjectService(
             message = message,
             routingKey = Rabbit.RoutingKey.OCRBACKEND_COMMAND_EXECUTE_MODEL
         )
+    }
+
+    @Transactional
+    fun uploadDocuments(id: UUID, documents: List<MultipartFile>) {
+        val project = findById(id)
+        val urlPathList: List<String> = s3StorageService.uploadToS3Storage(documents = documents.map { it.bytes })
+        urlPathList.map { urlPath ->
+            documentService.createDocument(
+                project = project,
+                request = DocumentCreateRequest(urlPath = urlPath)
+            )
+        }
+        logger.info { "Successfully added documents to $project" }
     }
 
 }

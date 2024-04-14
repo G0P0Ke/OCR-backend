@@ -6,7 +6,6 @@ import java.util.UUID
 
 data class DocumentCreateRequest(
     val urlPath: String,
-    val type: String
 )
 
 data class DocumentUpdateRequest(

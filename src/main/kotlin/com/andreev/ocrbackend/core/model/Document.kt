@@ -44,7 +44,7 @@ data class Document(
     var isLabeled: Boolean = false,
 
     @Column(name = "type")
-    val type: String?,
+    val type: String? = null,
 
     @Column(name = "url_path", nullable = false)
     val urlPath: String?,

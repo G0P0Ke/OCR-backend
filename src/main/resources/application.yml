@@ -32,6 +32,13 @@ spring:
       connectionTimeout: 30000 # 30sec
       idleTimeout: 600000 # 10min
 
+yandex-s3:
+  accessKey: "***REMOVED***"
+  secretKey: "***REMOVED***"
+  bucket: "***REMOVED***"
+  serviceEndpoint: "https://storage.yandexcloud.net"
+  signingRegion: "ru-central1"
+
 
 management:
   endpoints:
