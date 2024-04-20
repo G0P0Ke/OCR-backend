@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -35,6 +36,7 @@ class DocumentController(
         private val objectMapper: ObjectMapper = jacksonObjectMapper()
     }
 
+    @CrossOrigin
     @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Получение документа по id"
@@ -46,6 +48,7 @@ class DocumentController(
         return ResponseEntity.ok(documentConverter.toResponse(document = result))
     }
 
+    @CrossOrigin
     @PatchMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Обновление документа по id",
@@ -61,6 +64,7 @@ class DocumentController(
         return ResponseEntity.ok(documentConverter.toResponse(document = result))
     }
 
+    @CrossOrigin
     @DeleteMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Удаление документа по id",

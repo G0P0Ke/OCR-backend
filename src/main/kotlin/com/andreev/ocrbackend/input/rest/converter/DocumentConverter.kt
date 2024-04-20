@@ -14,6 +14,7 @@ class DocumentConverter(
         isLearnt = document.isLearnt,
         isValid = document.isValid,
         isLabeled = document.isLabeled,
+        labels = document.labels,
         type = document.type,
         urlPath = document.urlPath,
         createdAt = document.createdAt,

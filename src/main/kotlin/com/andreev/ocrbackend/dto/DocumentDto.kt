@@ -19,6 +19,7 @@ data class DocumentResponse(
     val isLearnt: Boolean?,
     val isValid: Boolean?,
     val isLabeled: Boolean,
+    val labels: JsonNode?,
     val type: String?,
     val urlPath: String?,
     val createdAt: LocalDateTime,

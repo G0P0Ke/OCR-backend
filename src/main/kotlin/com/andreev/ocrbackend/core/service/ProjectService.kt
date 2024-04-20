@@ -44,6 +44,32 @@ class ProjectService(
         return project.get()
     }
 
+    fun getMainDocUrlPath(project: Project): String? {
+        val documentCollection = project.documents
+        if (documentCollection.isNullOrEmpty()) {
+            return null
+        }
+        return documentCollection.first().urlPath
+    }
+
+    fun getProjectsByUserId(userId: UUID): List<Triple<RoleName, Project, String?>> {
+        val user = userService.findById(userId)
+        logger.info { "Try to find all projects of $user" }
+        val userProjectAgentList = userProjectAgentService.getAgentByUser(user)
+        val result = userProjectAgentList.map { agent ->
+            Triple(
+                agent.role.name,
+                agent.project,
+                getMainDocUrlPath(agent.project)
+            )
+        }
+        if (result.isEmpty()) {
+            logger.info { "$user doesn't have any project" }
+        }
+
+        return result
+    }
+
     @Transactional
     fun createProject(authentication: Authentication, request: CreateProjectRequest): Project {
         logger.info { "Try to create project with name: ${request.name}" }

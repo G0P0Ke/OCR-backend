@@ -31,7 +31,7 @@ class UserService(
 
     fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
 
-    fun findById(id: UUID) : User {
+    fun findById(id: UUID): User {
         val user = userRepository.findById(id)
         if (user.isEmpty) {
             logger.error { "User with id: $id not found" }
@@ -61,8 +61,17 @@ class UserService(
             SecurityContextHolder.getContext().authentication = authentication
 
             val jwtToken: String = jwtProvider.generateJwtToken(authentication)
+            logger.info { "User: ${entryDto.email} logged in" }
+            val user = getUserByEmail(entryDto.email)
 
-            return true to JwtResponse(jwtToken)
+            return true to JwtResponse(
+                accessToken = jwtToken,
+                id = user.id,
+                email = user.email,
+                name = user.name,
+                surname = user.surname,
+                company = user.company
+            )
         } else {
             return false to JwtResponse("")
         }

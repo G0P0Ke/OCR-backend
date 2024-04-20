@@ -8,6 +8,7 @@ import com.andreev.ocrbackend.input.rest.converter.UserConverter
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,6 +22,7 @@ class SecurityController(
     private val userConverter: UserConverter,
 ) {
 
+    @CrossOrigin
     @PostMapping(value = ["/register"], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(summary = "Регистрация пользователей")
     fun register(@Valid @RequestBody request: EntryDto): ResponseEntity<UserResponse> {
@@ -28,6 +30,7 @@ class SecurityController(
         return ResponseEntity.ok(userConverter.toResponse(user))
     }
 
+    @CrossOrigin
     @PostMapping(value = ["/login"], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(summary = "Вход в систему и получения JWT")
     fun login(@Valid @RequestBody entryDto: EntryDto): ResponseEntity<JwtResponse> {

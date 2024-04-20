@@ -32,6 +32,7 @@ class SecurityConfig(
 
     override fun configure(http: HttpSecurity) {
         val whiteListEndpoints = arrayOf(
+            "/v1/**",
             "/security/*",
             "/actuator/*",
             "/v2/api-docs",

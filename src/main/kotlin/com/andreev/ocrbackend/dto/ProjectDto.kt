@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.dto
 
+import com.andreev.ocrbackend.core.model.security.RoleName
 import com.andreev.ocrbackend.input.rest.validator.EnumValue
 import org.jetbrains.annotations.NotNull
 import java.time.LocalDateTime
@@ -36,7 +37,17 @@ data class ParticipantAdd(
 data class ProjectResponse(
     val id: UUID,
     val name: String,
+    val description: String,
     val createdAt: LocalDateTime,
     val document: List<DocumentResponse>,
     val participants: List<UserResponse>
+)
+
+data class ProjectResponseWithoutDocuments(
+    val userRole: RoleName,
+    val projectId: UUID,
+    val name: String,
+    val description: String,
+    val createdAt: LocalDateTime,
+    val mainDocUrl: String?
 )

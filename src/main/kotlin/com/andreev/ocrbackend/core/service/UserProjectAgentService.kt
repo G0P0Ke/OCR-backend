@@ -17,6 +17,8 @@ class UserProjectAgentService(
 
     companion object : KLogging()
 
+    fun getAgentByUser(user: User) : List<UserProjectAgent> = userProjectAgentRepository.findUserProjectAgentByUser(user)
+
     @Transactional
     fun createUserProjectAgent(
         user: User,
