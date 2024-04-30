@@ -45,10 +45,33 @@ yandex-s3:
 
 
 management:
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+      show-details: ALWAYS
+    prometheus:
+      enabled: true
+    env:
+      enabled: true
+    mappings:
+      enabled: true
+    metrics:
+      enabled: true
   endpoints:
     web:
+      base-path: "/"
       exposure:
-        include: "*"
+        include: info, health, prometheus, env, mappings, metrics
+      path-mapping:
+        info: actuator/info
+        health: actuator/health
+        prometheus: metrics
+        env: actuator/env
+        mappings: actuator/mappings
+        metrics: actuator/metrics
+    enabled-by-default: false
 
 
 logging:

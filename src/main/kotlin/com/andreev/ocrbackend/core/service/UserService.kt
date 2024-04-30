@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.core.service
 
+import com.andreev.ocrbackend.UserAlreadyExistsException
 import com.andreev.ocrbackend.UserNotFoundException
 import com.andreev.ocrbackend.core.model.User
 import com.andreev.ocrbackend.core.repository.UserRepository
@@ -42,6 +43,11 @@ class UserService(
 
     @Transactional
     fun register(entryDto: EntryDto): User {
+        val exists = existsUser(entryDto.email)
+        if (exists) {
+            logger.info { "User ${entryDto.email} already exists" }
+            throw UserAlreadyExistsException("User ${entryDto.email} already exists")
+        }
         logger.info { "Saving user with email: ${entryDto.email}" }
         val user = User(
             email = entryDto.email,
@@ -73,6 +79,7 @@ class UserService(
                 company = user.company
             )
         } else {
+            logger.info { "User ${entryDto.email} doesn't exist" }
             return false to JwtResponse("")
         }
     }

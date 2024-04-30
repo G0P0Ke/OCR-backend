@@ -5,13 +5,11 @@ import com.andreev.ocrbackend.dto.CreateProjectRequest
 import com.andreev.ocrbackend.dto.ProjectResponse
 import com.andreev.ocrbackend.dto.ProjectResponseWithoutDocuments
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
-import com.andreev.ocrbackend.dto.UserResponse
 import com.andreev.ocrbackend.input.rest.converter.ProjectConverter
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -32,7 +30,6 @@ class ProjectController(
     private val projectConverter: ProjectConverter
 ) {
 
-    @CrossOrigin
     @GetMapping("")
     @Operation(
         summary = "Получение всех проектов пользователя по userId",
@@ -44,7 +41,6 @@ class ProjectController(
         return ResponseEntity.ok(projectConverter.roleWithProjectResponse(projectList))
     }
 
-    @CrossOrigin
     @PostMapping("", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Создание нового проекта",
@@ -58,7 +54,6 @@ class ProjectController(
         return ResponseEntity.ok(projectConverter.toResponse(result))
     }
 
-    @CrossOrigin
     @PatchMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Обновление проекта по id",
@@ -72,7 +67,6 @@ class ProjectController(
         return ResponseEntity.ok(projectConverter.toResponse(result))
     }
 
-    @CrossOrigin
     @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Получение проекта по id",
@@ -84,7 +78,6 @@ class ProjectController(
         return ResponseEntity.ok(projectConverter.toResponse(result))
     }
 
-    @CrossOrigin
     @PostMapping("/{id}:execute", produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(
         summary = "Отправка команды EXECUTE по id проекта",
@@ -97,7 +90,6 @@ class ProjectController(
         return ResponseEntity.ok("Success. Project with id: $id was sent to execute")
     }
 
-    @CrossOrigin
     @PostMapping("/{id}:upload-documents")
     fun uploadDocuments(
         @PathVariable id: UUID,

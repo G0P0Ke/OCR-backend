@@ -5,7 +5,6 @@ import com.andreev.ocrbackend.dto.UserResponse
 import com.andreev.ocrbackend.input.rest.converter.UserConverter
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -18,7 +17,6 @@ class UserController(
     private val userConverter: UserConverter,
 ) {
 
-    @CrossOrigin
     @GetMapping("")
     @Operation(
         summary = "Получение пользователей по фильтру",

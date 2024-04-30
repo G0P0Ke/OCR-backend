@@ -22,13 +22,15 @@ class JwtAuthTokenFilter(
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain)  {
         try {
             val jwt = getJwt(request)
-            if (jwt != null && tokenProvider.validateJwtToken(jwt)) {
+            if (tokenProvider.validateJwtToken(jwt)) {
                 val username = tokenProvider.getUserNameFromJwtToken(jwt)
                 val userDetails = userDetailService.loadUserByUsername(username)
                 val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
                 authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
                 SecurityContextHolder.getContext().authentication = authentication
                 request.setAttribute("currentUser", username)
+            } else {
+                logger.warn("Can't validate JWT token")
             }
         } catch (e: Exception) {
             logger.error("Can NOT set user authentication", e)
@@ -38,9 +40,10 @@ class JwtAuthTokenFilter(
     }
 
     private fun getJwt(request: HttpServletRequest): String? {
-        val authHeader = request.getHeader("Authorization")
-        return if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            authHeader.replace("Bearer ", "")
-        } else null
+        val cookies = request.cookies
+        cookies?.forEach { cookie ->
+            if (cookie.name == "accessToken") return cookie.value
+        }
+        return null
     }
 }

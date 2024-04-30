@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
-import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.UnsupportedJwtException
 import mu.KLogging
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.beans.factory.annotation.Value
@@ -53,15 +53,15 @@ class JwtProvider(
             Jwts.parser().setSigningKey(JWT_SIGN_SECRET).parseClaimsJws(authToken)
             return true
         } catch (e: SignatureException) {
-            logger.debug("Invalid JWT signature -> Message: {} ", e.message)
+            logger.warn("Invalid JWT signature -> Message: {} ", e.message)
         } catch (e: MalformedJwtException) {
-            logger.debug("Invalid JWT token -> Message: {}", e.message)
+            logger.warn("Invalid JWT token -> Message: {}", e.message)
         } catch (e: ExpiredJwtException) {
-            logger.debug("Expired JWT token -> Message: {}", e.message)
+            logger.warn("Expired JWT token -> Message: {}", e.message)
         } catch (e: UnsupportedJwtException) {
-            logger.debug("Unsupported JWT token -> Message: {}", e.message)
+            logger.warn("Unsupported JWT token -> Message: {}", e.message)
         } catch (e: IllegalArgumentException) {
-            logger.debug("JWT claims string is empty -> Message: {}", e.message)
+            logger.warn("JWT claims string is empty -> Message: {}", e.message)
         }
         return false
     }

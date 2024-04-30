@@ -6,13 +6,15 @@ import com.andreev.ocrbackend.dto.EntryDto
 import com.andreev.ocrbackend.dto.UserResponse
 import com.andreev.ocrbackend.input.rest.converter.UserConverter
 import io.swagger.v3.oas.annotations.Operation
+import mu.KLogging
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 @RestController
@@ -22,7 +24,8 @@ class SecurityController(
     private val userConverter: UserConverter,
 ) {
 
-    @CrossOrigin
+    companion object : KLogging()
+
     @PostMapping(value = ["/register"], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(summary = "Регистрация пользователей")
     fun register(@Valid @RequestBody request: EntryDto): ResponseEntity<UserResponse> {
@@ -30,12 +33,21 @@ class SecurityController(
         return ResponseEntity.ok(userConverter.toResponse(user))
     }
 
-    @CrossOrigin
     @PostMapping(value = ["/login"], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(summary = "Вход в систему и получения JWT")
-    fun login(@Valid @RequestBody entryDto: EntryDto): ResponseEntity<JwtResponse> {
+    fun login(
+        @Valid @RequestBody entryDto: EntryDto,
+        response: HttpServletResponse
+    ): ResponseEntity<JwtResponse> {
         val result = userService.login(entryDto)
         return if (result.first) {
+            val cookie = Cookie("accessToken", result.second.accessToken)
+            cookie.isHttpOnly = false
+            cookie.secure = false
+            cookie.path = "/" // Makes the cookie available for all paths
+            cookie.maxAge = 3600 // Sets the cookie to expire after 1 hour
+            response.addCookie(cookie)
+            logger.info { "Add $cookie to header for ${entryDto.email}" }
             ResponseEntity.ok(result.second)
         } else ResponseEntity.badRequest().body(result.second)
     }
