@@ -52,7 +52,9 @@ class UserService(
         val user = User(
             email = entryDto.email,
             password = passwordEncoder.encode(entryDto.password),
-            company = entryDto.company
+            company = entryDto.company,
+            name = entryDto.name,
+            surname = entryDto.surname
         )
         val result = userRepository.save(user)
         logger.info { "Saved user $result" }

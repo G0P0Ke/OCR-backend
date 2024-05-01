@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -97,5 +98,16 @@ class ProjectController(
     ): ResponseEntity<String> {
         projectService.uploadDocuments(id = id, documents = documents)
         return ResponseEntity.ok("Success. Added documents to Project with id: $id")
+    }
+
+    @DeleteMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(
+        summary = "Удаление проекта по id",
+    )
+    fun deleteDocument(
+        @PathVariable id: UUID
+    ): ResponseEntity<String> {
+        projectService.deleteProject(id)
+        return ResponseEntity.ok("Successfully delete project with id: $id")
     }
 }

@@ -26,7 +26,8 @@ class ProjectConverter(
                     user = userProjectAgent.user,
                     role = userProjectAgent.role
                 )
-            } ?: emptyList()
+            } ?: emptyList(),
+            modelId = project.model?.id
         )
     }
 

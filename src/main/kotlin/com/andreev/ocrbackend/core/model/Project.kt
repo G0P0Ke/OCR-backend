@@ -12,6 +12,7 @@ import javax.persistence.EntityListeners
 import javax.persistence.FetchType
 import javax.persistence.Id
 import javax.persistence.OneToMany
+import javax.persistence.OneToOne
 import javax.persistence.Table
 
 @Entity
@@ -33,13 +34,17 @@ data class Project(
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)], orphanRemoval = true)
     @JsonIgnore
     val participants: MutableSet<UserProjectAgent>? = null,
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)], orphanRemoval = true)
     @JsonIgnore
     val documents: MutableSet<Document>? = mutableSetOf(),
+
+    @OneToOne(mappedBy = "project", fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)], orphanRemoval = true)
+    @JsonIgnore
+    val model: Model? = null
 ) {
     override fun toString(): String {
         return "Project(id: $id, name: $name, createdAt: $createdAt)"

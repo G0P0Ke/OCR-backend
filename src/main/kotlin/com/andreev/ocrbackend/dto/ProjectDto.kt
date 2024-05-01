@@ -40,7 +40,8 @@ data class ProjectResponse(
     val description: String,
     val createdAt: LocalDateTime,
     val document: List<DocumentResponse>,
-    val participants: List<UserResponse>
+    val participants: List<UserResponse>,
+    val modelId: UUID? = null
 )
 
 data class ProjectResponseWithoutDocuments(

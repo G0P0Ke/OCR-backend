@@ -47,7 +47,7 @@ class SecurityController(
             cookie.path = "/" // Makes the cookie available for all paths
             cookie.maxAge = 3600 // Sets the cookie to expire after 1 hour
             response.addCookie(cookie)
-            logger.info { "Add $cookie to header for ${entryDto.email}" }
+            logger.info { "Add cookie to header for ${entryDto.email}" }
             ResponseEntity.ok(result.second)
         } else ResponseEntity.badRequest().body(result.second)
     }

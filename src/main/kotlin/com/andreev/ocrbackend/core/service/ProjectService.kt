@@ -14,6 +14,7 @@ import com.andreev.ocrbackend.dto.ModelMessage
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
 import com.andreev.ocrbackend.output.rabbit.RabbitSender
 import mu.KLogging
+import org.apache.commons.io.FilenameUtils
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -68,6 +69,14 @@ class ProjectService(
         }
 
         return result
+    }
+
+    @Transactional
+    fun deleteProject(id: UUID) {
+        val project = findById(id)
+        logger.info { "Try to delete $project with all documents" }
+        projectRepository.deleteById(id)
+        logger.info { "Successfully deleted project with id: $id" }
     }
 
     @Transactional
@@ -147,7 +156,10 @@ class ProjectService(
     @Transactional
     fun uploadDocuments(id: UUID, documents: List<MultipartFile>) {
         val project = findById(id)
-        val urlPathList: List<String> = s3StorageService.uploadToS3Storage(documents = documents.map { it.bytes })
+        val extensionByDoc: List<Pair<ByteArray, String>> = documents.map {
+            it.bytes to FilenameUtils.getExtension(it.originalFilename)
+        }
+        val urlPathList: List<String> = s3StorageService.uploadToS3Storage(extensionByDoc = extensionByDoc)
         urlPathList.map { urlPath ->
             documentService.createDocument(
                 project = project,

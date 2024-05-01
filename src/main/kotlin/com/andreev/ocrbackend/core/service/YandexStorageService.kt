@@ -52,14 +52,15 @@ class YandexStorageService(
         }
     }
 
-    fun uploadToS3Storage(documents: List<ByteArray>) : List<String> {
+    fun uploadToS3Storage(extensionByDoc: List<Pair<ByteArray, String>>) : List<String> {
         val urls = ConcurrentLinkedQueue<String>()
 
         runBlocking {
             coroutineScope {
-                documents.map { documentBytes ->
+                extensionByDoc.map {
+                    val (documentBytes, extension) = it
                     async(Dispatchers.IO) {
-                        val fileName = generateUniqueName()
+                        val fileName = generateUniqueName() + "." + extension
                         val metadata = ObjectMetadata()
                         metadata.contentLength = documentBytes.size.toLong()
 

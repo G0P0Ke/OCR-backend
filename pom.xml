@@ -136,6 +136,13 @@
             <artifactId>aws-java-sdk</artifactId>
             <version>1.12.429</version>
         </dependency>
+
+        <!-- Files  -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
+        </dependency>
     </dependencies>
 
     <build>
