@@ -3,7 +3,16 @@ server:
   shutdown: graceful
   port: 8080
 
+mail:
+  debug: false
+
 spring:
+  mail:
+    host: mail.hosting.reg.ru
+    username: ***REMOVED***
+    password: ***REMOVED***
+    port: 465
+    protocol: smtps
   servlet:
     multipart:
       max-file-size: 100MB
@@ -22,6 +31,14 @@ spring:
     locale-resolver: fixed
   jpa:
     show-sql: false
+    properties:
+      hibernate:
+        generate_statistics: false
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 100
+
   liquibase:
     change-log: classpath:db/changelog/liquibase-changelog.xml
     enabled: true
@@ -35,6 +52,9 @@ spring:
       maxLifetime: 1800000 # 30min
       connectionTimeout: 30000 # 30sec
       idleTimeout: 600000 # 10min
+      data-source-properties:
+        reWriteBatchedInserts: true
+
 
 yandex-s3:
   accessKey: "***REMOVED***"
@@ -82,6 +102,7 @@ logging:
     org.hibernate.type: ERROR # TRACE for sql logging
     org.hibernate.stat: ERROR # DEBUG for statistics logging
     org.springframework.orm.jpa: ERROR # TRACE for transactions logging
+    #    net.ttddyy.dsproxy.listener: DEBUG # DEBUG enable logging for datasource-proxy
     org.springframework.transaction.interceptor: ERROR # TRACE for transactions logging
   pattern:
     console: "${spring.application.name} %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %X{traceId} - %msg%n"

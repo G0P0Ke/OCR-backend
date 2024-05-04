@@ -63,8 +63,9 @@ class ProjectController(
     fun updateProject(
         @PathVariable id: UUID,
         @RequestBody @Valid request: UpdateProjectRequest,
+        authentication: Authentication
     ): ResponseEntity<ProjectResponse> {
-        val result = projectService.updateProject(id, request)
+        val result = projectService.updateProject(id, request, authentication)
         return ResponseEntity.ok(projectConverter.toResponse(result))
     }
 

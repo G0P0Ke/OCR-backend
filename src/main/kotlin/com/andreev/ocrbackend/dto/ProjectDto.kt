@@ -18,8 +18,9 @@ data class CreateProjectRequest(
 data class UpdateProjectRequest(
     @field:[Size(max = 255)]
     val name: String?,
+    @field:[Size(min = 1, max = 255)]
+    val description: String?,
     val participants: Set<ParticipantAdd>?,
-    val documents: Set<DocumentCreateRequest>?
 )
 
 data class ParticipantAdd(

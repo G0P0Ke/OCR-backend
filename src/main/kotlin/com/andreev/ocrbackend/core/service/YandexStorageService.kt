@@ -10,7 +10,6 @@ import com.amazonaws.services.s3.model.ObjectMetadata
 import com.andreev.ocrbackend.configuration.YandexStorageConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -52,28 +51,31 @@ class YandexStorageService(
         }
     }
 
-    fun uploadToS3Storage(extensionByDoc: List<Pair<ByteArray, String>>) : List<String> {
+    fun uploadToS3Storage(extensionByDoc: List<Pair<ByteArray, String>>): List<String> {
         val urls = ConcurrentLinkedQueue<String>()
 
         runBlocking {
-            coroutineScope {
-                extensionByDoc.map {
-                    val (documentBytes, extension) = it
-                    async(Dispatchers.IO) {
-                        val fileName = generateUniqueName() + "." + extension
-                        val metadata = ObjectMetadata()
-                        metadata.contentLength = documentBytes.size.toLong()
+            val jobs = extensionByDoc.map {
+                val (documentBytes, extension) = it
+                async(Dispatchers.IO) {
+                    val fileName = generateUniqueName() + "." + extension
+                    val metadata = ObjectMetadata()
+                    metadata.contentLength = documentBytes.size.toLong()
 
-                        val inputStream = ByteArrayInputStream(documentBytes)
-                        s3Client.putObject(configs.bucket, fileName, inputStream, metadata)
-                        logger.info("Upload Document to S3. Added file: $fileName to bucket: ${configs.bucket}")
+                    ByteArrayInputStream(documentBytes).use { inputStream ->
+                        try {
+                            s3Client.putObject(configs.bucket, fileName, inputStream, metadata)
+                            logger.info("Upload Document to S3. Added file: $fileName to bucket: ${configs.bucket}")
 
-                        val url = s3Client.getUrl(configs.bucket, fileName).toURI().toString()
-
-                        urls.add(url)
+                            val url = s3Client.getUrl(configs.bucket, fileName).toURI().toString()
+                            urls.add(url)
+                        } catch (e: Exception) {
+                            logger.error("Failed to upload file $fileName", e)
+                        }
                     }
-                }.forEach { it.await() }
+                }
             }
+            jobs.forEach { it.await() }
         }
         return urls.toList()
     }

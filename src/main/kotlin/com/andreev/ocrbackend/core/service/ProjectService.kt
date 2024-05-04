@@ -12,6 +12,7 @@ import com.andreev.ocrbackend.dto.CreateProjectRequest
 import com.andreev.ocrbackend.dto.DocumentCreateRequest
 import com.andreev.ocrbackend.dto.ModelMessage
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
+import com.andreev.ocrbackend.output.mail.MailSender
 import com.andreev.ocrbackend.output.rabbit.RabbitSender
 import mu.KLogging
 import org.apache.commons.io.FilenameUtils
@@ -31,7 +32,8 @@ class ProjectService(
     private val modelService: ModelService,
     private val documentService: DocumentService,
     private val s3StorageService: YandexStorageService,
-    private val rabbitSender: RabbitSender
+    private val rabbitSender: RabbitSender,
+    private val mailSender: MailSender
 ) {
 
     companion object : KLogging()
@@ -113,30 +115,46 @@ class ProjectService(
     }
 
     @Transactional
-    fun updateProject(id: UUID, request: UpdateProjectRequest): Project {
+    fun updateProject(id: UUID, request: UpdateProjectRequest, authentication: Authentication): Project {
         val project = findById(id)
+        val manager = authentication.principal as UserPrinciple
         with(request) {
             name?.let { project.name = name }
-            participants?.map { userAdd ->
-                val user = userService.findById(userAdd.userId)
-                val role = roleService.findRoleByName(RoleName.valueOf(userAdd.role))
-                userProjectAgentService.createUserProjectAgent(
-                    user = user,
-                    project = project,
-                    role = role
-                )
+            description?.let { project.description = description }
+
+            participants?.let { users ->
+                val assessors = users.map { userAdd ->
+                    val user = userService.findById(userAdd.userId)
+                    val role = roleService.findRoleByName(RoleName.valueOf(userAdd.role))
+                    userProjectAgentService.createUserProjectAgent(
+                        user = user,
+                        project = project,
+                        role = role
+                    )
+                    user.email to "${user.name} ${user.surname}"
+                }.toSet()
+
+                sendMessageToAssessors(assessors, projectName = project.name, managerEmail = manager.username)
             }
-            documents?.map { documentCreate ->
-                documentService.createDocument(
-                    project = project,
-                    request = documentCreate
-                )
-            }
+
         }
 
         val savedProject = projectRepository.save(project)
         logger.info { "Successfully updated $savedProject" }
         return savedProject
+    }
+
+    fun sendMessageToAssessors(assessors: Set<Pair<String, String>>, projectName: String, managerEmail: String) {
+        val subject = "Invite to project: $projectName"
+        assessors.forEach { (mail, fullName) ->
+            val message = "Hello, $fullName!\n" +
+                "Your manager $managerEmail invite you to the project: $projectName for marking up documents"
+            mailSender.sendTo(
+                emailTo = mail,
+                subject = subject,
+                message = message
+            )
+        }
     }
 
     @Transactional
