@@ -10,6 +10,7 @@ import com.andreev.ocrbackend.core.repository.ProjectRepository
 import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import com.andreev.ocrbackend.dto.CreateProjectRequest
 import com.andreev.ocrbackend.dto.DocumentCreateRequest
+import com.andreev.ocrbackend.dto.DocumentUploadRequest
 import com.andreev.ocrbackend.dto.ModelMessage
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
 import com.andreev.ocrbackend.output.mail.MailSender
@@ -172,7 +173,7 @@ class ProjectService(
     }
 
     @Transactional
-    fun uploadDocuments(id: UUID, documents: List<MultipartFile>) {
+    fun uploadDocuments(id: UUID, documents: List<MultipartFile>, request: DocumentUploadRequest) {
         val project = findById(id)
         val extensionByDoc: List<Pair<ByteArray, String>> = documents.map {
             it.bytes to FilenameUtils.getExtension(it.originalFilename)
@@ -181,7 +182,8 @@ class ProjectService(
         urlPathList.map { urlPath ->
             documentService.createDocument(
                 project = project,
-                request = DocumentCreateRequest(urlPath = urlPath)
+                request = DocumentCreateRequest(urlPath = urlPath),
+                type = request.type
             )
         }
         logger.info { "Successfully added documents to $project" }

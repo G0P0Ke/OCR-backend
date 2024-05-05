@@ -21,7 +21,7 @@ import java.util.Date
 
 @Component
 class JwtProvider(
-    @Value("3600")
+    @Value("\${jwt.expiration}")
     private val jwtExpiration: Int
 ) {
 

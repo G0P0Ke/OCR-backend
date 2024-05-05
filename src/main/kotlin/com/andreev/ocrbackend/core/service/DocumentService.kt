@@ -30,10 +30,15 @@ class DocumentService(
     }
 
     @Transactional
-    fun createDocument(project: Project, request: DocumentCreateRequest): Document {
+    fun createDocument(
+        project: Project,
+        request: DocumentCreateRequest,
+        type: String
+    ): Document {
         val document = Document(
             urlPath = request.urlPath,
-            project = project
+            project = project,
+            type = type
         )
         val savedDocument = documentRepository.save(document)
         logger.info { "Successfully created $savedDocument" }

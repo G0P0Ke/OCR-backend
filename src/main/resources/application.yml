@@ -6,6 +6,9 @@ server:
 mail:
   debug: false
 
+jwt:
+  expiration: 86400
+
 spring:
   mail:
     host: mail.hosting.reg.ru

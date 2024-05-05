@@ -62,7 +62,7 @@ data class Document(
     val assessors: MutableSet<UserDocumentAgent>? = mutableSetOf(),
 ) {
     override fun toString(): String {
-        return "Document(id: $id, isLabeled: $isLabeled, createdAt: $createdAt)"
+        return "Document(id: $id, isLabeled: $isLabeled, type: $type, createdAt: $createdAt)"
     }
 
     override fun hashCode(): Int {

@@ -2,6 +2,7 @@ package com.andreev.ocrbackend.input.rest.controller
 
 import com.andreev.ocrbackend.core.service.ProjectService
 import com.andreev.ocrbackend.dto.CreateProjectRequest
+import com.andreev.ocrbackend.dto.DocumentUploadRequest
 import com.andreev.ocrbackend.dto.ProjectResponse
 import com.andreev.ocrbackend.dto.ProjectResponseWithoutDocuments
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
@@ -95,9 +96,10 @@ class ProjectController(
     @PostMapping("/{id}:upload-documents")
     fun uploadDocuments(
         @PathVariable id: UUID,
-        @RequestPart("documents") documents: List<MultipartFile>
+        @RequestPart("documents") documents: List<MultipartFile>,
+        @RequestPart("request") @Valid request: DocumentUploadRequest
     ): ResponseEntity<String> {
-        projectService.uploadDocuments(id = id, documents = documents)
+        projectService.uploadDocuments(id = id, documents = documents, request = request)
         return ResponseEntity.ok("Success. Added documents to Project with id: $id")
     }
 
