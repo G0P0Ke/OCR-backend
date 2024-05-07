@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.core.service
 
+import com.andreev.ocrbackend.ProjectAlreadyExistsException
 import com.andreev.ocrbackend.ProjectNotFoundException
 import com.andreev.ocrbackend.Rabbit
 import com.andreev.ocrbackend.core.enums.Command
@@ -10,8 +11,10 @@ import com.andreev.ocrbackend.core.repository.ProjectRepository
 import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import com.andreev.ocrbackend.dto.CreateProjectRequest
 import com.andreev.ocrbackend.dto.DocumentCreateRequest
+import com.andreev.ocrbackend.dto.DocumentType
 import com.andreev.ocrbackend.dto.DocumentUploadRequest
 import com.andreev.ocrbackend.dto.ModelMessage
+import com.andreev.ocrbackend.dto.ParticipantAdd
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
 import com.andreev.ocrbackend.output.mail.MailSender
 import com.andreev.ocrbackend.output.rabbit.RabbitSender
@@ -48,12 +51,12 @@ class ProjectService(
         return project.get()
     }
 
-    fun getMainDocUrlPath(project: Project): String? {
+    fun getTemplateDocUrlPath(project: Project): String? {
         val documentCollection = project.documents
         if (documentCollection.isNullOrEmpty()) {
             return null
         }
-        return documentCollection.first().urlPath
+        return documentCollection.firstOrNull { it.type == DocumentType.TEMPLATE.name }?.urlPath
     }
 
     fun getProjectsByUserId(userId: UUID): List<Triple<RoleName, Project, String?>> {
@@ -64,7 +67,7 @@ class ProjectService(
             Triple(
                 agent.role.name,
                 agent.project,
-                getMainDocUrlPath(agent.project)
+                getTemplateDocUrlPath(agent.project)
             )
         }
         if (result.isEmpty()) {
@@ -82,8 +85,16 @@ class ProjectService(
         logger.info { "Successfully deleted project with id: $id" }
     }
 
+    fun existsProjectByName(name: String): Boolean = projectRepository.existsByName(name)
+
     @Transactional
     fun createProject(authentication: Authentication, request: CreateProjectRequest): Project {
+        val exists = existsProjectByName(request.name)
+        if (exists) {
+            logger.info { "Project with title ${request.name} already exists" }
+            throw ProjectAlreadyExistsException("Project with title ${request.name} already exists")
+        }
+
         logger.info { "Try to create project with name: ${request.name}" }
         val creator = authentication.principal as UserPrinciple
         val user = userService.getUserByEmail(creator.username)
@@ -100,15 +111,7 @@ class ProjectService(
             role = role
         )
 
-        request.participants?.map { userAdd ->
-            val userToProject = userService.findById(userAdd.userId)
-            val roleOfNewParticipants = roleService.findRoleByName(RoleName.valueOf(userAdd.role))
-            userProjectAgentService.createUserProjectAgent(
-                user = userToProject,
-                project = project,
-                role = roleOfNewParticipants
-            )
-        }
+        request.participants?.let { addParticipantToProject(it, project, manager = creator) }
 
         logger.info { "Successfully created $savedProject" }
 
@@ -116,28 +119,18 @@ class ProjectService(
     }
 
     @Transactional
-    fun updateProject(id: UUID, request: UpdateProjectRequest, authentication: Authentication): Project {
+    fun updateProject(
+        id: UUID,
+        request: UpdateProjectRequest,
+        authentication: Authentication
+    ): Project {
         val project = findById(id)
         val manager = authentication.principal as UserPrinciple
         with(request) {
             name?.let { project.name = name }
             description?.let { project.description = description }
 
-            participants?.let { users ->
-                val assessors = users.map { userAdd ->
-                    val user = userService.findById(userAdd.userId)
-                    val role = roleService.findRoleByName(RoleName.valueOf(userAdd.role))
-                    userProjectAgentService.createUserProjectAgent(
-                        user = user,
-                        project = project,
-                        role = role
-                    )
-                    user.email to "${user.name} ${user.surname}"
-                }.toSet()
-
-                sendMessageToAssessors(assessors, projectName = project.name, managerEmail = manager.username)
-            }
-
+            participants?.let { addParticipantToProject(it, project, manager) }
         }
 
         val savedProject = projectRepository.save(project)
@@ -145,11 +138,37 @@ class ProjectService(
         return savedProject
     }
 
-    fun sendMessageToAssessors(assessors: Set<Pair<String, String>>, projectName: String, managerEmail: String) {
+    fun addParticipantToProject(
+        participants: Set<ParticipantAdd>,
+        project: Project,
+        manager: UserPrinciple,
+    ) {
+        participants.let { users ->
+            val assessors = users.map { userAdd ->
+                val user = userService.findById(userAdd.userId)
+                val role = roleService.findRoleByName(RoleName.valueOf(userAdd.role))
+                userProjectAgentService.createUserProjectAgent(
+                    user = user,
+                    project = project,
+                    role = role
+                )
+                user.email to "${user.name} ${user.surname}"
+            }.toSet()
+
+            sendInviteMessageTo(assessors, projectName = project.name, managerEmail = manager.username)
+        }
+    }
+
+    fun sendInviteMessageTo(
+        assessors: Set<Pair<String, String>>,
+        projectName: String,
+        managerEmail: String,
+    ) {
         val subject = "Invite to project: $projectName"
         assessors.forEach { (mail, fullName) ->
             val message = "Hello, $fullName!\n" +
-                "Your manager $managerEmail invite you to the project: $projectName for marking up documents"
+                "Your manager $managerEmail invite you to the project: $projectName"
+            logger.info { "Sending invite message to $fullName" }
             mailSender.sendTo(
                 emailTo = mail,
                 subject = subject,

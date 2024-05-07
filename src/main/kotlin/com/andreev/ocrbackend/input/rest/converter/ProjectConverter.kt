@@ -18,7 +18,7 @@ class ProjectConverter(
             name = name,
             createdAt = createdAt,
             description = project.description,
-            document = documents?.map { document ->
+            documents = documents?.map { document ->
                 documentConverter.toResponse(document)
             } ?: emptyList(),
             participants = project.participants?.map { userProjectAgent ->
@@ -34,11 +34,11 @@ class ProjectConverter(
     fun roleWithProjectResponse(triple: List<Triple<RoleName, Project, String?>>) = triple.map { projectByUserRole ->
         ProjectResponseWithoutDocuments(
             userRole = projectByUserRole.first,
-            projectId = projectByUserRole.second.id,
+            id = projectByUserRole.second.id,
             name = projectByUserRole.second.name,
             description = projectByUserRole.second.description,
             createdAt = projectByUserRole.second.createdAt,
-            mainDocUrl = projectByUserRole.third
+            previewURL = projectByUserRole.third
         )
     }
 }

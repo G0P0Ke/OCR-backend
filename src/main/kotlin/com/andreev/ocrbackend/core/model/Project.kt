@@ -24,7 +24,7 @@ data class Project(
     @JsonIgnore
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     var name: String,
 
     @Column(name = "description")

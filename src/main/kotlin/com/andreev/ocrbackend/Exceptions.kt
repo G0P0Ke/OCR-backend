@@ -39,5 +39,10 @@ class UserAlreadyExistsException(
     override val message: String?
 ) : RuntimeException()
 
+class ProjectAlreadyExistsException(
+    override val message: String?
+) : RuntimeException()
+
+
 class JsonValidationException(errorMessages: List<String>) :
     RuntimeException("JSON validation failed: Errors: ${errorMessages.joinToString()}")

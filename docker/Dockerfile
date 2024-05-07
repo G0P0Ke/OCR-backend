@@ -1,15 +1,20 @@
-# Use Maven to build the application
+# Слой для загрузки зависимостей Maven
 FROM maven:3.8.4-openjdk-17 as builder
 WORKDIR /app
 COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Слой для сборки приложения
+FROM maven:3.8.4-openjdk-17 as builder-with-src
+WORKDIR /app
+COPY pom.xml .
 COPY src ./src
-RUN mvn -B dependency:resolve dependency:resolve-plugins -DskipTests
-COPY . .
+COPY --from=builder /root/.m2 /root/.m2
 RUN mvn -B clean package -Dmaven.test.skip=true
 
-# Use a slim JRE image for the runtime
+# Слой для запуска приложения
 FROM arsiachou/temurin-jre17
 WORKDIR /app
-COPY --from=builder /app/target/*.jar /app/app.jar
+COPY --from=builder-with-src /app/target/*.jar /app/app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

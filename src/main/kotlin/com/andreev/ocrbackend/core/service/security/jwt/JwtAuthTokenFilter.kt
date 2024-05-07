@@ -22,6 +22,10 @@ class JwtAuthTokenFilter(
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain)  {
         try {
             val jwt = getJwt(request)
+            if (jwt == null) {
+                filterChain.doFilter(request, response)
+                return
+            }
             if (tokenProvider.validateJwtToken(jwt)) {
                 val username = tokenProvider.getUserNameFromJwtToken(jwt)
                 val userDetails = userDetailService.loadUserByUsername(username)
@@ -30,7 +34,7 @@ class JwtAuthTokenFilter(
                 SecurityContextHolder.getContext().authentication = authentication
                 request.setAttribute("currentUser", username)
             } else {
-                logger.warn("Can't validate JWT token")
+                logger.warn("Can't validate JWT token with URI: ${request.requestURI}")
             }
         } catch (e: Exception) {
             logger.error("Can NOT set user authentication", e)
