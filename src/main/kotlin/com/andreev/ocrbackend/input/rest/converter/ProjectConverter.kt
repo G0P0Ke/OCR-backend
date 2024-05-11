@@ -36,7 +36,8 @@ class ProjectConverter(
         role: RoleName,
         project: Project,
         previewUrl: String?,
-        analytics: DocumentStatisticDto
+        analytics: DocumentStatisticDto,
+        isTemplateLabeled: Boolean
     ) = ProjectResponseWithoutDocuments(
         userRole = role,
         id = project.id,
@@ -45,6 +46,8 @@ class ProjectConverter(
         createdAt = project.createdAt,
         previewURL = previewUrl,
         totalDocuments = analytics.totalDocuments,
-        labeledDocuments = analytics.labeledDocuments
+        labeledDocuments = analytics.labeledDocuments,
+        datasetDocuments = analytics.datasetDocuments,
+        isTemplateLabeled = isTemplateLabeled
     )
 }

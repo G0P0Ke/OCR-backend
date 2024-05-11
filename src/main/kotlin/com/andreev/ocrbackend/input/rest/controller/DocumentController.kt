@@ -12,6 +12,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -42,8 +43,8 @@ class DocumentController(
     fun getDocument(
         @PathVariable id: UUID
     ): ResponseEntity<DocumentResponse> {
-        val result = documentService.getDocumentById(id)
-        return ResponseEntity.ok(documentConverter.toResponse(document = result))
+        val (document, templateLabels) = documentService.getDocumentForLabeling(id)
+        return ResponseEntity.ok(documentConverter.toResponseForLabeling(document = document, templateLabels = templateLabels))
     }
 
     @PatchMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -53,11 +54,16 @@ class DocumentController(
     )
     fun updateDocument(
         @PathVariable id: UUID,
-        @RequestBody @Valid request: JsonNode
+        @RequestBody @Valid request: JsonNode,
+        authentication: Authentication
     ): ResponseEntity<DocumentResponse> {
         jsonValidationService.validate(jsonNode = request, schemaPath = VALIDATION_SCHEMA_LABELS)
         val documentUpdateRequest = objectMapper.convertValue<DocumentUpdateRequest>(request)
-        val result = documentService.updateDocument(id = id, request = documentUpdateRequest)
+        val result = documentService.updateDocument(
+            id = id,
+            request = documentUpdateRequest,
+            authentication = authentication
+        )
         return ResponseEntity.ok(documentConverter.toResponse(document = result))
     }
 

@@ -5,6 +5,7 @@ import com.andreev.ocrbackend.UserNotFoundException
 import com.andreev.ocrbackend.core.model.User
 import com.andreev.ocrbackend.core.repository.UserRepository
 import com.andreev.ocrbackend.core.service.domain.security.JwtResponse
+import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import com.andreev.ocrbackend.core.service.security.jwt.JwtProvider
 import com.andreev.ocrbackend.dto.EntryDto
 import mu.KLogging
@@ -28,7 +29,12 @@ class UserService(
         private var passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
     }
 
-    fun findUsersByCompany(company: String): Collection<User> = userRepository.findUsersByCompany(company)
+    fun findUsersByCompany(company: String, authentication: Authentication): Collection<User> {
+        val manager = authentication.principal as UserPrinciple
+        return userRepository
+            .findUsersByCompany(company)
+            .filter { user -> user.email != manager.username }
+    }
 
     fun getUserByEmail(email: String) = userRepository.findUserByEmail(email)
 

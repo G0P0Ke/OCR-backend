@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.core.model
 
+import com.andreev.ocrbackend.dto.DocumentType
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -59,5 +60,17 @@ data class Project(
         if (javaClass != other?.javaClass) return false
         other as Project
         return id == other.id
+    }
+
+    fun isTemplateLabeled(): Boolean {
+        val documentCollection = documents
+        if (documentCollection.isNullOrEmpty()) {
+            return false
+        }
+        val hasTemplateWithNullLabels = documentCollection
+            .firstOrNull { it.type == DocumentType.TEMPLATE.name}
+            ?.labels
+            ?.isNull ?: true
+        return !hasTemplateWithNullLabels
     }
 }

@@ -43,6 +43,10 @@ class ProjectAlreadyExistsException(
     override val message: String?
 ) : RuntimeException()
 
+class LabelingPermissionException(
+    override val message: String?
+) : RuntimeException()
+
 
 class JsonValidationException(errorMessages: List<String>) :
     RuntimeException("JSON validation failed: Errors: ${errorMessages.joinToString()}")

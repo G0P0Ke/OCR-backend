@@ -74,7 +74,8 @@ class ProjectService(
                 role = agent.role.name,
                 project = agent.project,
                 previewUrl = getTemplateDocUrlPath(agent.project),
-                analytics = numberOfDocsAndLabeled
+                analytics = numberOfDocsAndLabeled,
+                isTemplateLabeled = agent.project.isTemplateLabeled()
             )
         }
         if (result.isEmpty()) {

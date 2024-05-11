@@ -1,6 +1,7 @@
 package com.andreev.ocrbackend.input.rest.advice
 
 import com.andreev.ocrbackend.DocumentNotFoundException
+import com.andreev.ocrbackend.LabelingPermissionException
 import com.andreev.ocrbackend.ModelNotFoundException
 import com.andreev.ocrbackend.ProjectAlreadyExistsException
 import com.andreev.ocrbackend.ProjectNotFoundException
@@ -106,6 +107,13 @@ class RestErrorHandler(val exceptionMessageSource: MessageSource) : ResponseEnti
     @ExceptionHandler(value = [ProjectAlreadyExistsException::class])
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     fun handle(e: ProjectAlreadyExistsException): ErrorResponse {
+        log.error(e.message, e)
+        return ErrorResponse(listOf(ErrorDescription(e.message ?: "No exception message was provided")))
+    }
+
+    @ExceptionHandler(value = [LabelingPermissionException::class])
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    fun handle(e: LabelingPermissionException): ErrorResponse {
         log.error(e.message, e)
         return ErrorResponse(listOf(ErrorDescription(e.message ?: "No exception message was provided")))
     }

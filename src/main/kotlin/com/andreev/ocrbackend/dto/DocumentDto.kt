@@ -32,6 +32,7 @@ data class DocumentResponse(
     val isValid: Boolean?,
     val isLabeled: Boolean,
     val labels: JsonNode?,
+    val templateLabels: JsonNode? = null,
     val type: String?,
     val urlPath: String?,
     val createdAt: LocalDateTime,
@@ -40,5 +41,7 @@ data class DocumentResponse(
 
 data class DocumentStatisticDto(
     val totalDocuments: Long,
-    val labeledDocuments: Long
+    val labeledDocuments: Long,
+    val datasetDocuments: Long,
+    val freeDocuments: Long,
 )

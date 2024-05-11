@@ -52,6 +52,8 @@ data class ProjectResponseWithoutDocuments(
     val description: String,
     val totalDocuments: Long,
     val labeledDocuments: Long,
+    val datasetDocuments: Long,
+    val isTemplateLabeled: Boolean,
     val createdAt: LocalDateTime,
     val previewURL: String?
 )
