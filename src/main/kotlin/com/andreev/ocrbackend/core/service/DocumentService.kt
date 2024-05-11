@@ -5,6 +5,7 @@ import com.andreev.ocrbackend.core.model.Document
 import com.andreev.ocrbackend.core.model.Project
 import com.andreev.ocrbackend.core.repository.DocumentRepository
 import com.andreev.ocrbackend.dto.DocumentCreateRequest
+import com.andreev.ocrbackend.dto.DocumentStatisticDto
 import com.andreev.ocrbackend.dto.DocumentUpdateRequest
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -19,6 +20,14 @@ class DocumentService(
 ) {
 
     companion object : KLogging()
+
+    fun analyticsOfDocsInProject(projectId: UUID): DocumentStatisticDto {
+        val result = documentRepository.countDocumentsAndLabeledDocuments(projectId)
+        return DocumentStatisticDto(
+            totalDocuments = result["total_documents"].toString().toLong(),
+            labeledDocuments = result["labeled_documents"].toString().toLong()
+        )
+    }
 
     fun getDocumentById(id: UUID): Document {
         val document = documentRepository.findById(id)

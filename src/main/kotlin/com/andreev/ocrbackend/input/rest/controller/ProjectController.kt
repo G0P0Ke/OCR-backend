@@ -40,7 +40,7 @@ class ProjectController(
         @RequestParam(name = "userId", required = true) userId: UUID
     ): ResponseEntity<List<ProjectResponseWithoutDocuments>> {
         val projectList = projectService.getProjectsByUserId(userId)
-        return ResponseEntity.ok(projectConverter.roleWithProjectResponse(projectList))
+        return ResponseEntity.ok(projectList)
     }
 
     @PostMapping("", produces = [MediaType.APPLICATION_JSON_VALUE])

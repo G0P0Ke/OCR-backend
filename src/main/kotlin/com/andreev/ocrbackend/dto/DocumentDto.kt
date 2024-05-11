@@ -37,3 +37,8 @@ data class DocumentResponse(
     val createdAt: LocalDateTime,
     val assessors: List<UserResponse>
 )
+
+data class DocumentStatisticDto(
+    val totalDocuments: Long,
+    val labeledDocuments: Long
+)

@@ -11,11 +11,14 @@ import com.andreev.ocrbackend.core.repository.ProjectRepository
 import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import com.andreev.ocrbackend.dto.CreateProjectRequest
 import com.andreev.ocrbackend.dto.DocumentCreateRequest
+import com.andreev.ocrbackend.dto.DocumentStatisticDto
 import com.andreev.ocrbackend.dto.DocumentType
 import com.andreev.ocrbackend.dto.DocumentUploadRequest
 import com.andreev.ocrbackend.dto.ModelMessage
 import com.andreev.ocrbackend.dto.ParticipantAdd
+import com.andreev.ocrbackend.dto.ProjectResponseWithoutDocuments
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
+import com.andreev.ocrbackend.input.rest.converter.ProjectConverter
 import com.andreev.ocrbackend.output.mail.MailSender
 import com.andreev.ocrbackend.output.rabbit.RabbitSender
 import mu.KLogging
@@ -30,6 +33,7 @@ import javax.transaction.Transactional
 @Service
 class ProjectService(
     private val projectRepository: ProjectRepository,
+    private val projectConverter: ProjectConverter,
     private val userProjectAgentService: UserProjectAgentService,
     private val userService: UserService,
     private val roleService: RoleService,
@@ -59,15 +63,18 @@ class ProjectService(
         return documentCollection.firstOrNull { it.type == DocumentType.TEMPLATE.name }?.urlPath
     }
 
-    fun getProjectsByUserId(userId: UUID): List<Triple<RoleName, Project, String?>> {
+    fun getProjectsByUserId(userId: UUID): List<ProjectResponseWithoutDocuments> {
         val user = userService.findById(userId)
         logger.info { "Try to find all projects of $user" }
         val userProjectAgentList = userProjectAgentService.getAgentByUser(user)
         val result = userProjectAgentList.map { agent ->
-            Triple(
-                agent.role.name,
-                agent.project,
-                getTemplateDocUrlPath(agent.project)
+            val numberOfDocsAndLabeled: DocumentStatisticDto =
+                documentService.analyticsOfDocsInProject(projectId = agent.project.id)
+            projectConverter.toProjectResponseWithoutDocuments(
+                role = agent.role.name,
+                project = agent.project,
+                previewUrl = getTemplateDocUrlPath(agent.project),
+                analytics = numberOfDocsAndLabeled
             )
         }
         if (result.isEmpty()) {
