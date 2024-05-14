@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.input.rest.controller
 
+import com.andreev.ocrbackend.core.model.security.RoleName
 import com.andreev.ocrbackend.core.service.UserService
 import com.andreev.ocrbackend.core.service.domain.security.JwtResponse
 import com.andreev.ocrbackend.dto.EntryDto
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation
 import mu.KLogging
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -29,7 +31,7 @@ class SecurityController(
     @PostMapping(value = ["/register"], produces = [MediaType.APPLICATION_JSON_VALUE])
     @Operation(summary = "Регистрация пользователей")
     fun register(@Valid @RequestBody request: EntryDto): ResponseEntity<UserResponse> {
-        val user = userService.register(entryDto = request)
+        val user = userService.register(entryDto = request, roleName = RoleName.ROLE_USER)
         return ResponseEntity.ok(userConverter.toResponse(user))
     }
 
@@ -41,14 +43,26 @@ class SecurityController(
     ): ResponseEntity<JwtResponse> {
         val result = userService.login(entryDto)
         return if (result.first) {
-            val cookie = Cookie("accessToken", result.second.accessToken)
-            cookie.isHttpOnly = false
-            cookie.secure = false
-            cookie.path = "/" // Makes the cookie available for all paths
-            cookie.maxAge = 3600 // Sets the cookie to expire after 1 hour
-            response.addCookie(cookie)
+            addJWTtoCookie(jwtResponse = result.second, response = response)
             logger.info { "Add cookie to header for ${entryDto.email}" }
             ResponseEntity.ok(result.second)
         } else ResponseEntity.badRequest().body(result.second)
+    }
+
+    @PostMapping(value = ["/private/register"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Добавление администраторов в систему")
+    fun privateRegister(@Valid @RequestBody request: EntryDto): ResponseEntity<UserResponse> {
+        val user = userService.register(entryDto = request, roleName = RoleName.ROLE_ADMIN)
+        return ResponseEntity.ok(userConverter.toResponse(user))
+    }
+
+    fun addJWTtoCookie(jwtResponse: JwtResponse, response: HttpServletResponse) {
+        val cookie = Cookie("accessToken", jwtResponse.accessToken)
+        cookie.isHttpOnly = false
+        cookie.secure = false
+        cookie.path = "/" // Makes the cookie available for all paths
+        cookie.maxAge = 3600 // Sets the cookie to expire after 1 hour
+        response.addCookie(cookie)
     }
 }

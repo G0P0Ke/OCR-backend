@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -31,7 +32,7 @@ import javax.validation.ConstraintViolationException
 @ResponseBody
 class RestErrorHandler(val exceptionMessageSource: MessageSource) : ResponseEntityExceptionHandler() {
     private companion object : KLogging() {
-        val log = KotlinLogging.logger {} //to avoid name clash with `logger` from ResponseEntityExceptionHandler
+        val log = KotlinLogging.logger {} // to avoid name clash with `logger` from ResponseEntityExceptionHandler
         val DEFAULT_HEADERS = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
         }
@@ -66,6 +67,15 @@ class RestErrorHandler(val exceptionMessageSource: MessageSource) : ResponseEnti
         return response(
             listOf(ErrorDescription(e.message ?: "No exception message was provided")),
             HttpStatus.INTERNAL_SERVER_ERROR
+        )
+    }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handle(e: AccessDeniedException): ResponseEntity<Any> {
+        log.error(e.message, e)
+        return response(
+            listOf(ErrorDescription(e.message ?: "No exception message was provided")),
+            HttpStatus.FORBIDDEN
         )
     }
 

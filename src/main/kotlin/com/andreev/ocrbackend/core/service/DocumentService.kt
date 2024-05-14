@@ -26,6 +26,14 @@ class DocumentService(
 
     companion object : KLogging()
 
+    fun getDocumentsWithLabelsAsCsv(projectId: UUID): String {
+        logger.info { "Get documents with labels != null and type != FREE" }
+        val documents = documentRepository.findDocumentsWithLabels(projectId)
+        return documents.joinToString(separator = "\n") { document ->
+            "${document.id},${document.labels},${document.isLearnt},${document.isValid},${document.isLabeled},${document.type},${document.urlPath},${document.createdAt}"
+        }
+    }
+
     fun analyticsOfDocsInProject(projectId: UUID): DocumentStatisticDto {
         val result = documentRepository.countDocumentsAndLabeledDocuments(projectId)
         val freeDocuments = result["free_documents"].toString().toLong()
@@ -90,6 +98,9 @@ class DocumentService(
             }
             isLabeled?.let {
                 document.isLabeled = isLabeled
+            }
+            isValid?.let {
+                document.isValid = isValid
             }
             assessor?.let { userAssessorId ->
                 val user = userService.findById(userAssessorId)

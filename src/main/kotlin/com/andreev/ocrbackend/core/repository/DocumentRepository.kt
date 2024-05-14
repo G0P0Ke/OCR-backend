@@ -19,4 +19,16 @@ interface DocumentRepository : JpaRepository<Document, UUID> {
     """, nativeQuery = true
     )
     fun countDocumentsAndLabeledDocuments(@Param("projectId") projectId: UUID): Map<String, Any>
+
+
+    @Query(
+        value = """
+        SELECT d 
+        FROM Document d 
+        WHERE d.project.id = :projectId 
+            AND d.labels IS NOT NULL 
+            AND d.type != 'FREE'
+        """
+    )
+    fun findDocumentsWithLabels(@Param("projectId") projectId: UUID): List<Document>
 }

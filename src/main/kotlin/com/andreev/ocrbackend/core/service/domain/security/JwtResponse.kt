@@ -9,5 +9,6 @@ data class JwtResponse(
     val email: String? = null,
     val name: String? = null,
     val surname: String? = null,
-    val company: String? = null
+    val company: String? = null,
+    val role: String? = null,
 )

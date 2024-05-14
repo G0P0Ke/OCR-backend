@@ -1,0 +1,15 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <!-- Add role column to users table -->
+    <changeSet id="add-role-column-to-user" author="aaandreev">
+        <addColumn tableName="users">
+            <column name="role_id" type="serial">
+                <constraints nullable="true" foreignKeyName="fk_user_to_role" references="role(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

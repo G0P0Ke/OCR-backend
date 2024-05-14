@@ -13,8 +13,8 @@ data class UserPrinciple(
 ) : UserDetails {
 
     companion object {
-        fun build(user: User): UserPrinciple {
-            val authorities = mutableListOf<GrantedAuthority>(SimpleGrantedAuthority(RoleName.ROLE_USER.name))
+        fun build(user: User, role: RoleName): UserPrinciple {
+            val authorities = mutableListOf<GrantedAuthority>(SimpleGrantedAuthority(role.name))
 
             return UserPrinciple(
                 email = user.email,

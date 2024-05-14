@@ -13,7 +13,8 @@ class UserConverter {
         email = user.email,
         name = user.name,
         surname = user.surname,
-        company = user.company
+        company = user.company,
+        role = user.role?.name?.name
     )
 
     fun toResponseWithRole(user: User, role: Role) = UserResponse(

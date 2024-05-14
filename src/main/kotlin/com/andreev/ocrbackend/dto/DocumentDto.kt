@@ -23,11 +23,13 @@ enum class DocumentType {
 data class DocumentUpdateRequest(
     val labels: JsonNode?,
     val isLabeled: Boolean?,
+    val isValid: Boolean?,
     val assessor: UUID?,
 )
 
 data class DocumentResponse(
     val id: UUID,
+    val projectId: UUID,
     val isLearnt: Boolean?,
     val isValid: Boolean?,
     val isLabeled: Boolean,

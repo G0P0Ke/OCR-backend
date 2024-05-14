@@ -3,11 +3,14 @@ package com.andreev.ocrbackend.core.service
 import com.andreev.ocrbackend.UserAlreadyExistsException
 import com.andreev.ocrbackend.UserNotFoundException
 import com.andreev.ocrbackend.core.model.User
+import com.andreev.ocrbackend.core.model.security.RoleName
+import com.andreev.ocrbackend.core.repository.RoleRepository
 import com.andreev.ocrbackend.core.repository.UserRepository
 import com.andreev.ocrbackend.core.service.domain.security.JwtResponse
 import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import com.andreev.ocrbackend.core.service.security.jwt.JwtProvider
 import com.andreev.ocrbackend.dto.EntryDto
+import com.andreev.ocrbackend.dto.UserUpdateRequest
 import mu.KLogging
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -22,11 +25,40 @@ import java.util.UUID
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val roleRepository: RoleRepository,
     private val authenticationManager: AuthenticationManager,
     private val jwtProvider: JwtProvider
 ) {
     companion object : KLogging() {
         private var passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
+    }
+
+    fun getAllUsers(authentication: Authentication): MutableList<User> {
+        val admin = authentication.principal as UserPrinciple
+        logger.info { "Admin ${admin.username} get all users" }
+        return userRepository.findAll()
+    }
+
+    @Transactional
+    fun updateUser(userId: UUID, request: UserUpdateRequest): User {
+        val user = findById(id = userId)
+        logger.info { "Try to update $user" }
+        with(request) {
+            email?.let { user.email = email }
+            name?.let { user.name = name }
+            surname?.let { user.surname = surname }
+            company?.let { user.company = company }
+            password?.let { user.password = passwordEncoder.encode(password) }
+        }
+        val savedUser = userRepository.save(user)
+        logger.info { "Successfully update user info: $savedUser" }
+        return savedUser
+    }
+
+    @Transactional
+    fun deleteUser(userId: UUID) {
+        logger.info { "Try to delete user with id: $userId" }
+        userRepository.deleteById(userId)
     }
 
     fun findUsersByCompany(company: String, authentication: Authentication): Collection<User> {
@@ -48,8 +80,9 @@ class UserService(
     }
 
     @Transactional
-    fun register(entryDto: EntryDto): User {
+    fun register(entryDto: EntryDto, roleName: RoleName): User {
         val exists = existsUser(entryDto.email)
+        val role = roleRepository.findByName(roleName)
         if (exists) {
             logger.info { "User ${entryDto.email} already exists" }
             throw UserAlreadyExistsException("User ${entryDto.email} already exists")
@@ -60,7 +93,8 @@ class UserService(
             password = passwordEncoder.encode(entryDto.password),
             company = entryDto.company,
             name = entryDto.name,
-            surname = entryDto.surname
+            surname = entryDto.surname,
+            role = role
         )
         val result = userRepository.save(user)
         logger.info { "Saved user $result" }
@@ -84,7 +118,8 @@ class UserService(
                 email = user.email,
                 name = user.name,
                 surname = user.surname,
-                company = user.company
+                company = user.company,
+                role = user.role?.name?.name
             )
         } else {
             logger.info { "User ${entryDto.email} doesn't exist" }

@@ -20,6 +20,9 @@
             "labelName": {
               "type": "string"
             },
+            "type": {
+              "type": "string"
+            },
             "x": {
               "type": "number"
             },
@@ -45,6 +48,9 @@
     },
     "assessor": {
       "type": "string"
+    },
+    "isValid": {
+      "type": "boolean"
     }
   }
 }

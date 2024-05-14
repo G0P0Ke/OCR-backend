@@ -12,6 +12,7 @@ class DocumentConverter(
 
     fun toResponse(document: Document) = DocumentResponse(
         id = document.id,
+        projectId = document.project.id,
         isLearnt = document.isLearnt,
         isValid = document.isValid,
         isLabeled = document.isLabeled,
@@ -26,6 +27,7 @@ class DocumentConverter(
 
     fun toResponseForLabeling(document: Document, templateLabels: JsonNode?) = DocumentResponse(
         id = document.id,
+        projectId = document.project.id,
         isLearnt = document.isLearnt,
         isValid = document.isValid,
         isLabeled = document.isLabeled,

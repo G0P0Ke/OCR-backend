@@ -1,6 +1,7 @@
 package com.andreev.ocrbackend.core.service.security
 
 import com.andreev.ocrbackend.core.model.User
+import com.andreev.ocrbackend.core.model.security.RoleName
 import com.andreev.ocrbackend.core.repository.UserRepository
 import com.andreev.ocrbackend.core.service.domain.security.UserPrinciple
 import org.springframework.security.core.userdetails.UserDetails
@@ -17,7 +18,11 @@ class UserDetailsServiceImpl(
     override fun loadUserByUsername(email: String): UserDetails {
         return try {
             val user: User = userRepository.findUserByEmail(email)
-            UserPrinciple.build(user)
+            if (user.role != null && user.role.name == RoleName.ROLE_ADMIN) {
+                UserPrinciple.build(user, user.role.name)
+            } else {
+                UserPrinciple.build(user, RoleName.ROLE_USER)
+            }
         } catch (e: EntityNotFoundException) {
             throw UsernameNotFoundException("User not found", e)
         }

@@ -1,5 +1,6 @@
 package com.andreev.ocrbackend.core.model
 
+import com.andreev.ocrbackend.core.model.security.Role
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -7,6 +8,8 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.Table
 
@@ -36,9 +39,17 @@ data class User(
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)])
     @JsonIgnore
     val projects: MutableSet<UserProjectAgent> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [(CascadeType.ALL)])
+    @JsonIgnore
+    val documents: MutableSet<UserDocumentAgent> = mutableSetOf(),
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = true)
+    val role: Role? = null
 ) {
     override fun toString(): String {
-        return "User(id: $id, name: $name, surname: $surname, email: $email)"
+        return "User(id: $id, name: $name, surname: $surname, email: $email, company: $company)"
     }
 
     override fun hashCode(): Int {

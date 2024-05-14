@@ -8,6 +8,8 @@ import com.andreev.ocrbackend.dto.ProjectResponseWithoutDocuments
 import com.andreev.ocrbackend.dto.UpdateProjectRequest
 import com.andreev.ocrbackend.input.rest.converter.ProjectConverter
 import io.swagger.v3.oas.annotations.Operation
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -31,6 +33,17 @@ class ProjectController(
     private val projectService: ProjectService,
     private val projectConverter: ProjectConverter
 ) {
+
+    @GetMapping("/{id}/markup", produces = ["text/csv"])
+    @Operation(summary = "Получение размеченных документов в формате csv",)
+    fun getDocumentsWithLabels(@PathVariable id: UUID): ResponseEntity<String> {
+        val csvData = projectService.getMarkupDocuments(projectId = id)
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.parseMediaType("text/csv")
+            add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=markupDocuments.csv")
+        }
+        return ResponseEntity(csvData, headers, HttpStatus.OK)
+    }
 
     @GetMapping("")
     @Operation(

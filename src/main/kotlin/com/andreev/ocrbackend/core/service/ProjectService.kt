@@ -55,6 +55,8 @@ class ProjectService(
         return project.get()
     }
 
+    fun getMarkupDocuments(projectId: UUID) = documentService.getDocumentsWithLabelsAsCsv(projectId = projectId)
+
     fun getTemplateDocUrlPath(project: Project): String? {
         val documentCollection = project.documents
         if (documentCollection.isNullOrEmpty()) {
