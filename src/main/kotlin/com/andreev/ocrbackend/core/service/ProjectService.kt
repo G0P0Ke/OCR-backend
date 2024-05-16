@@ -23,6 +23,7 @@ import com.andreev.ocrbackend.output.mail.MailSender
 import com.andreev.ocrbackend.output.rabbit.RabbitSender
 import mu.KLogging
 import org.apache.commons.io.FilenameUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -41,7 +42,13 @@ class ProjectService(
     private val documentService: DocumentService,
     private val s3StorageService: YandexStorageService,
     private val rabbitSender: RabbitSender,
-    private val mailSender: MailSender
+    private val mailSender: MailSender,
+    @Value("\${machineLearning.batchSize}")
+    private val batchSize: Int = 2,
+    @Value("\${machineLearning.modelType}")
+    private val modelType: String = "YOLO8",
+    @Value("\${machineLearning.epoch}")
+    private val epoch: Int = 50
 ) {
 
     companion object : KLogging()
@@ -191,13 +198,19 @@ class ProjectService(
     fun executeProject(id: UUID) {
         val project = findById(id)
         val model = modelService.getModelByProjectId(project)
-        val message = ModelMessage(modelId = model.id.toString(), command = Command.EXECUTE)
+        val message = ModelMessage(
+            modelId = model.id.toString(),
+            command = Command.TRAIN.name,
+            batch_size = batchSize,
+            model_type = modelType,
+            epoch = epoch
+        )
         modelService.updateStatusModel(status = Model.Status.IN_PROGRESS, model = model)
 
         rabbitSender.send(
             exchange = Rabbit.Exchange.OCRBACKEND_TX_X_HSE_LEARNING_COMMANDS_V1,
-            message = message,
-            routingKey = Rabbit.RoutingKey.OCRBACKEND_COMMAND_EXECUTE_MODEL
+            message = message.toJson(),
+            routingKey = Rabbit.RoutingKey.OCRBACKEND_COMMAND_TRAIN_MODEL
         )
     }
 

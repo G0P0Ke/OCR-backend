@@ -2,6 +2,8 @@ package com.andreev.ocrbackend.core.service
 
 import com.andreev.ocrbackend.DocumentNotFoundException
 import com.andreev.ocrbackend.LabelingPermissionException
+import com.andreev.ocrbackend.Rabbit
+import com.andreev.ocrbackend.core.enums.Command
 import com.andreev.ocrbackend.core.model.Document
 import com.andreev.ocrbackend.core.model.Project
 import com.andreev.ocrbackend.core.repository.DocumentRepository
@@ -10,6 +12,8 @@ import com.andreev.ocrbackend.dto.DocumentCreateRequest
 import com.andreev.ocrbackend.dto.DocumentStatisticDto
 import com.andreev.ocrbackend.dto.DocumentType
 import com.andreev.ocrbackend.dto.DocumentUpdateRequest
+import com.andreev.ocrbackend.dto.ModelMessageInference
+import com.andreev.ocrbackend.output.rabbit.RabbitSender
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KLogging
 import org.springframework.security.core.Authentication
@@ -22,6 +26,7 @@ class DocumentService(
     private val documentRepository: DocumentRepository,
     private val userDocumentAgentService: UserDocumentAgentService,
     private val userService: UserService,
+    private val rabbitSender: RabbitSender
 ) {
 
     companion object : KLogging()
@@ -81,7 +86,24 @@ class DocumentService(
         )
         val savedDocument = documentRepository.save(document)
         logger.info { "Successfully created $savedDocument" }
+        if (type == DocumentType.FREE.name) {
+            inferenceDocument(document)
+        }
         return savedDocument
+    }
+
+    fun inferenceDocument(document: Document) {
+        val message = ModelMessageInference(
+            modelId = document.project.model?.id.toString(),
+            documentId = document.id.toString(),
+            command = Command.INFERENCE.name
+        )
+
+        rabbitSender.send(
+            exchange = Rabbit.Exchange.OCRBACKEND_TX_X_HSE_LEARNING_COMMANDS_V1,
+            message = message.toJson(),
+            routingKey = Rabbit.RoutingKey.OCRBACKEND_COMMAND_INFERENCE_MODEL
+        )
     }
 
     @Transactional

@@ -34,7 +34,7 @@ class RabbitSender(
             logger.info {
                 "Publishing RabbitMQ message: $message on exchange=$exchange, routingKey=$routingKey"
             }
-            rabbitTemplate.convertAndSend(exchange, routingKey, Message(message.toString().toByteArray()))
+            rabbitTemplate.convertAndSend(exchange, routingKey, message)
         } catch (e: RuntimeException) {
             logger.error(e) {
                 "Exception during publishing RabbitMQ message $message on exchange=$exchange, routingKey=$routingKey"

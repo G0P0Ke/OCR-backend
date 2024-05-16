@@ -29,6 +29,32 @@ spring:
         size: 25
       connection:
         mode: CONNECTION
+  cloud:
+    stream:
+      rabbit:
+        bindings:
+          ocrBackendMachineLearningResult-in-0:
+            consumer:
+                autoBindDlq: true
+                dlqTtl: 300000 #5min
+                dlqDeadLetterExchange:
+                prefetch: 20
+                queueNameGroupOnly: true
+      bindings:
+        ocrBackendMachineLearningResult-in-0:
+          destination: ocr.modelpipeline.run
+          group: ocrBackend.ml.result
+          binder: defaultRabbit
+          consumer:
+            concurrency: 3
+            max-attempts: 1
+      binders:
+        defaultRabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                virtual-host: /
   web:
     locale: en_GB
     locale-resolver: fixed
@@ -65,6 +91,12 @@ yandex-s3:
   bucket: "***REMOVED***"
   serviceEndpoint: "https://storage.yandexcloud.net"
   signingRegion: "ru-central1"
+
+
+machineLearning:
+  batchSize: 2
+  modelType: "YOLO8"
+  epoch: 50
 
 
 management:
